@@ -1,0 +1,35 @@
+# Genera tráfico para que los logs tengan contenido
+curl -s http://taskflow.local > /dev/null
+curl -s http://taskflow.local/no-existe > /dev/null
+curl -s http://localhost > /dev/null
+
+{
+echo "===== 1. taskflow.conf ====="
+cat /etc/apache2/sites-available/taskflow.conf
+echo; echo "===== 2. 000-catchall.conf ====="
+cat /etc/apache2/sites-available/000-catchall.conf
+echo; echo "===== 3. Sitios activos (sin 000-default.conf) ====="
+ls -l /etc/apache2/sites-enabled/
+echo; echo "===== 4. /etc/hosts ====="
+cat /etc/hosts
+echo; echo "===== 5. Sintaxis ====="
+sudo apache2ctl configtest 2>&1
+echo; echo "===== 6. Como ve Apache los virtual hosts ====="
+sudo apache2ctl -S 2>&1
+echo; echo "===== 7. curl taskflow.local (debe mostrar el frontend) ====="
+curl -sI http://taskflow.local
+curl -s http://taskflow.local
+echo; echo "===== 8. curl localhost (NO debe mostrar el frontend) ====="
+curl -sI http://localhost
+curl -s http://localhost
+echo; echo "===== 9. Ficheros de log separados ====="
+ls -l /var/log/apache2/
+echo; echo "===== 10. taskflow_access.log ====="
+sudo tail -n 5 /var/log/apache2/taskflow_access.log
+echo; echo "===== 11. taskflow_error.log ====="
+sudo tail -n 5 /var/log/apache2/taskflow_error.log
+echo; echo "===== 12. default_access.log ====="
+sudo tail -n 5 /var/log/apache2/default_access.log
+} > ~/evidencias.txt 2>&1
+
+cat ~/evidencias.txt
